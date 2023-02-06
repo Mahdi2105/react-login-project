@@ -18,12 +18,12 @@ const emailReducer = (state, action) => {
 
 const passwordReducer = (state, action) => {
   if (action.type === "PASSWORD_INPUT") {
-    return { value: action.val, isValid: action.val >= 7 };
+    return { value: action.val, isValid: action.val.length >= 7 };
   }
   if (action.type === "INPUT_BLUR") {
     // State return the prev state, i.e what was entered, so that
     // the field won't be empty/reset
-    return { value: state.value, isValid: state.value >= 7 };
+    return { value: state.value, isValid: state.value.length >= 7 };
   }
   return { value: "", isValid: false };
 };
@@ -45,11 +45,27 @@ const Login = (props) => {
     isValid: null,
   });
 
+  // Object Destructoring
+  // Assigning the isValid sections of an object to a new variable which
+  // the data. The use of this in this scenario is that after the validation
+  // requirements are met, it will stop checking as it is not needed
+
+  const { isValid: emailIsValid } = emailState;
+  const { isValid: passwordIsValid } = passwordState;
+
   useEffect(() => {
-    setFormIsValid(
-      emailState.value.includes("@") && passwordState.value.trim().length > 6
-    );
-  }, [emailState.value, passwordState.value]);
+    const identifier = setTimeout(() => {
+      console.log("Checking form validity");
+      // This code here is before the object destructoring
+      // setFormIsValid(emailState.isValid && passwordState.isValid);
+      setFormIsValid(emailIsValid && passwordIsValid);
+    }, 500);
+
+    return () => {
+      console.log("Clean up");
+      clearTimeout(identifier);
+    };
+  }, [emailIsValid, passwordIsValid]);
 
   const emailChangeHandler = (event) => {
     // This is an action
